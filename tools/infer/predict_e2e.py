@@ -7,6 +7,7 @@ sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = '1'
 
 import cv2
 import numpy as np
@@ -63,7 +64,8 @@ class TextE2E(BaseOCRV20):
         self.postprocess_op = build_post_process(postprocess_params)
 
         use_gpu = args.use_gpu
-        self.use_gpu = torch.cuda.is_available() and use_gpu
+        self.use_gpu = (torch.cuda.is_available() or (torch.backends.mps.is_available() and torch.backends.mps.is_built())) and use_gpu
+        self.gpu_device = torch.device(("cuda" if torch.cuda.is_available() else "mps") if self.use_gpu else "cpu")
         self.weights_path = args.e2e_model_path
         self.yaml_path = args.e2e_yaml_path
         network_config = utility.AnalysisConfig(self.weights_path, self.yaml_path)
@@ -72,7 +74,7 @@ class TextE2E(BaseOCRV20):
         self.load_pytorch_weights(self.weights_path)
         self.net.eval()
         if self.use_gpu:
-            self.net.cuda()
+            self.net.to(self.gpu_device)
 
     def clip_det_res(self, points, img_height, img_width):
         for pno in range(points.shape[0]):
@@ -105,7 +107,7 @@ class TextE2E(BaseOCRV20):
         with torch.no_grad():
             inp = torch.from_numpy(img)
             if self.use_gpu:
-                inp = inp.cuda()
+                inp = inp.to(self.gpu_device)
             outputs = self.net(inp)
 
         preds = {}

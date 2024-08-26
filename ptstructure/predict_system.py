@@ -7,6 +7,7 @@ sys.path.append(__dir__)
 sys.path.append(os.path.abspath(os.path.join(__dir__, '..')))
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = '1'
 import cv2
 import numpy as np
 import time

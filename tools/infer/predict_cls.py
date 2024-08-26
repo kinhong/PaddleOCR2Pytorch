@@ -29,7 +29,8 @@ class TextClassifier(BaseOCRV20):
         self.postprocess_op = build_post_process(postprocess_params)
 
         use_gpu = args.use_gpu
-        self.use_gpu = torch.cuda.is_available() and use_gpu
+        self.use_gpu = (torch.cuda.is_available() or (torch.backends.mps.is_available() and torch.backends.mps.is_built())) and use_gpu
+        self.gpu_device = torch.device(("cuda" if torch.cuda.is_available() else "mps") if self.use_gpu else "cpu")
 
         self.weights_path = args.cls_model_path
         self.yaml_path = args.cls_yaml_path
@@ -44,7 +45,7 @@ class TextClassifier(BaseOCRV20):
         self.load_pytorch_weights(self.weights_path)
         self.net.eval()
         if self.use_gpu:
-            self.net.cuda()
+            self.net.to(self.gpu_device)
 
     def resize_norm_img(self, img):
         imgC, imgH, imgW = self.cls_image_shape
@@ -103,7 +104,7 @@ class TextClassifier(BaseOCRV20):
             with torch.no_grad():
                 inp = torch.from_numpy(norm_img_batch)
                 if self.use_gpu:
-                    inp = inp.cuda()
+                    inp = inp.to(self.gpu_device)
                 prob_out = self.net(inp)
             prob_out = prob_out.cpu().numpy()
 

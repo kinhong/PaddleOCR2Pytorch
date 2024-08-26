@@ -44,7 +44,8 @@ class PPYOLOv2:
         if not os.path.exists(model_path) or not os.path.isfile(model_path):
             raise FileNotFoundError('{} is not existed.'.format(model_path))
         use_gpu = kwargs.get('INIT_use_gpu', True)
-        self.use_gpu = torch.cuda.is_available() and use_gpu
+        self.use_gpu = (torch.cuda.is_available() or (torch.backends.mps.is_available() and torch.backends.mps.is_built())) and use_gpu
+        self.gpu_device = torch.device(("cuda" if torch.cuda.is_available() else "mps") if self.use_gpu else "cpu")
         self.input_shape = kwargs.get('INIT_det_input_shape', (640, 640))
         self.conf_thresh = kwargs.get('INIT_det_thresh', 0.4)
         self.nms_thresh = kwargs.get('INIT_det_nms_thresh', 0.4)
@@ -94,7 +95,7 @@ class PPYOLOv2:
 
 
         if self.use_gpu:
-            self.net.cuda()
+            self.net.to(self.gpu_device)
 
     def preprocess(self, image):
         # not keep ratio
@@ -206,7 +207,7 @@ class PPYOLOv2:
 
         inp = torch.from_numpy(image_data)
         if self.use_gpu:
-            inp = inp.cuda()
+            inp = inp.to(self.gpu_device)
         with torch.no_grad():
             outputs = self.net(inp)
 
