@@ -147,3 +147,7 @@ det_models*
 rec_models*
 *副本*
 *测试数据*
+
+.DS_Store
+.vscode/
+output/

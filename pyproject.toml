@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools==72.1.0", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paddleocr2pytorch"
+version = "0.1"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache License 2.0"}
+
+[tool.setuptools]
+packages = ["paddleocr2pytorch"]
+package-dir = { "paddleocr2pytorch" = "" }
+include-package-data = true
