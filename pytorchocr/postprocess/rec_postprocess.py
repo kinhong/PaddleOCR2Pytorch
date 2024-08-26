@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import re
 import numpy as np
 import string
 #import paddle
@@ -74,7 +75,7 @@ class BaseRecLabelDecode(object):
                 else:
                     conf_list.append(1)
             text = ''.join(char_list)
-            result_list.append((text, np.mean(conf_list)))
+            result_list.append((text, np.mean(conf_list) if conf_list else np.NaN))
         return result_list
 
     def get_ignored_tokens(self):

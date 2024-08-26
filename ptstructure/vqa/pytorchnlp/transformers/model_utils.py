@@ -452,7 +452,7 @@ def load_layoutxlm_weights(torch_model, weights_path):
         _load_torch_weights(torch_model, weights_path)
 
 def _load_torch_weights(torch_model, weights_path):
-    torch_model.load_state_dict(torch.load(weights_path))
+    torch_model.load_state_dict(torch.load(weights_path, weights_only=True))
     print('model is loaded: {}'.format(weights_path))
 
 def _load_paddle_layoutxlm_weights(torch_model, weights_path):

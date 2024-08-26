@@ -221,7 +221,7 @@ class PPYOLOv2Base(nn.Module):
 
 
     def load_pytorch_weights(self, weights_path):
-        self.load_state_dict(torch.load(weights_path))
+        self.load_state_dict(torch.load(weights_path, weights_only=True))
         print('model is loaded: {}'.format(weights_path))
 
 

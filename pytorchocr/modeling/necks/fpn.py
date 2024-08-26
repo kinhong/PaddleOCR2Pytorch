@@ -80,10 +80,10 @@ class FPN(nn.Module):
                 nn.init.zeros_(m.bias)
 
     def _upsample(self, x, scale=1):
-        return F.upsample(x, scale_factor=scale, mode='bilinear')
+        return F.interpolate(x, scale_factor=scale, mode='bilinear')
 
     def _upsample_add(self, x, y, scale=1):
-        return F.upsample(x, scale_factor=scale, mode='bilinear') + y
+        return F.interpolate(x, scale_factor=scale, mode='bilinear') + y
 
     def forward(self, x):
         f2, f3, f4, f5 = x
